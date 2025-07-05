@@ -20,3 +20,20 @@ services:
     ports:
       - 8191:8191
     restart: unless-stopped
+  nginx:
+    container_name: nginx
+    image: 'jc21/nginx-proxy-manager:latest'
+    ports:
+      - '80:80'
+      - '443:443'
+      - '81:81'
+    environment:
+      DISABLE_IPV6: 'true'
+    healthcheck:
+      test: ["CMD", "/usr/bin/check-health"]
+      interval: 10s
+      timeout: 3s
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/nginx/data:/data
+      - ${INSTALL_DIRECTORY}/config/nginx/letsencrypt:/etc/letsencrypt
+    restart: unless-stoppe
