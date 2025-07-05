@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Constants
-readonly DC="docker compose -f <filename> -f <custom_file_filename>"
-readonly INSTALL_DIRECTORY="<install_directory>"
+readonly DC="docker compose -f /opt/yams/docker-compose.yaml -f /opt/yams/docker-compose.custom.yaml"
+readonly INSTALL_DIRECTORY="/opt/yams"
 readonly TIMEOUT_SECONDS=60
 readonly IP_ENDPOINTS=(
     "https://ipinfo.io/ip"
