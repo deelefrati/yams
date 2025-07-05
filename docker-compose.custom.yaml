@@ -1,2 +1,22 @@
-# services:  -> When you uncomment, remember to remove the space too! "services:" must be left without any spaces around it
-  # Add your custom services here!
+services:
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=America/Sao_Paulo
+      - PORT=5055 #optional
+    ports:
+      - 5055:5055
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/${MEDIA_SERVICE}:/app/config
+    restart: unless-stopped
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - TZ=America/Sao_Paulo
+    ports:
+      - 8191:8191
+    restart: unless-stopped

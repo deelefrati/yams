@@ -296,15 +296,11 @@ running_services_location() {
 
 	local -A services=(
 		["qBittorrent"]="8081"
-		["SABnzbd"]="8080"
 		["Radarr"]="7878"
 		["Sonarr"]="8989"
-		["Lidarr"]="8686"
-		["Readarr"]="8787"
 		["Prowlarr"]="9696"
 		["Bazarr"]="6767"
 		["$media_service"]="$media_service_port"
-		["Portainer"]="9000"
 	)
 
 	echo -e "Service URLs:"
