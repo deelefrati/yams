@@ -103,7 +103,7 @@ check_dependencies() {
 
     # Check for required commands and collect missing ones
     for pkg in "${REQUIRED_COMMANDS[@]}"; do
-        if ! command -v "$pkg" &> /dev/null; then
+        if ! command -v "$pkg" &>/dev/null; then
             missing_packages+=("$pkg")
         else
             log_success "$pkg exists ✅"
@@ -113,7 +113,7 @@ check_dependencies() {
     # If there are missing packages, offer to install them
     if [ ${#missing_packages[@]} -gt 0 ]; then
         log_warning "Missing required packages: ${missing_packages[*]}"
-        read -p "Would you like to install the missing packages? (y/N) [Default = n]: " install_deps
+        read -rp "Would you like to install the missing packages? (y/N) [Default = n]: " install_deps
         install_deps=${install_deps:-"n"}
 
         if [ "${install_deps,,}" = "y" ]; then
@@ -128,7 +128,7 @@ check_dependencies() {
     fi
 
     # Check Docker and Docker Compose
-    if command -v docker &> /dev/null; then
+    if command -v docker &>/dev/null; then
         # Check if Docker is installed via snap
         if [[ $(which docker) == "/snap/bin/docker" ]]; then
             log_error "Docker is installed via snap. YAMS requires the official Docker installation from docker.com. Please remove snap Docker and install Docker from https://docs.docker.com/engine/install/ or install docker using YAMS"
@@ -136,13 +136,13 @@ check_dependencies() {
         log_success "docker exists ✅"
     fi
 
-    if docker compose version &> /dev/null; then
+    if docker compose version &>/dev/null; then
         log_success "docker compose exists ✅"
         return 0
     fi
 
     log_warning "⚠️  Docker/Docker Compose not found! ⚠️"
-    read -p "Install Docker and Docker Compose? Only works on Debian/Ubuntu (y/N) [Default = n]: " install_docker
+    read -rp "Install Docker and Docker Compose? Only works on Debian/Ubuntu (y/N) [Default = n]: " install_docker
     install_docker=${install_docker:-"n"}
 
     if [ "${install_docker,,}" = "y" ]; then
@@ -163,11 +163,11 @@ configure_media_service() {
     log_info "- emby"
     log_info "- plex (advanced, always online)"
 
-    read -p "Choose your media service [$DEFAULT_MEDIA_SERVICE]: " media_service
+    read -rp "Choose your media service [$DEFAULT_MEDIA_SERVICE]: " media_service
     media_service=${media_service:-$DEFAULT_MEDIA_SERVICE}
     media_service=$(echo "$media_service" | awk '{print tolower($0)}')
 
-    if [[ ! " ${SUPPORTED_MEDIA_SERVICES[@]} " =~ " ${media_service} " ]]; then
+    if [[ ! " ${SUPPORTED_MEDIA_SERVICES[*]} " =~ ${media_service} ]]; then
         log_error "\"$media_service\" is not supported by YAMS"
     fi
 
@@ -192,7 +192,7 @@ configure_vpn() {
     log_info "Time to set up the VPN."
     log_info "Supported VPN providers: https://yams.media/advanced/vpn"
 
-    read -p "Configure VPN? (Y/n) [Default = y]: " setup_vpn
+    read -rp "Configure VPN? (Y/n) [Default = y]: " setup_vpn
     setup_vpn=${setup_vpn:-"y"}
 
     if [ "${setup_vpn,,}" != "y" ]; then
@@ -200,13 +200,13 @@ configure_vpn() {
         return 0
     fi
 
-    read -p "VPN service? (with spaces) [$DEFAULT_VPN_SERVICE]: " vpn_service
+    read -rp "VPN service? (with spaces) [$DEFAULT_VPN_SERVICE]: " vpn_service
     vpn_service=${vpn_service:-$DEFAULT_VPN_SERVICE}
 
-# Clear screen and show dramatic warning
+    # Clear screen and show dramatic warning
     printf "\033c"
 
-    cat << "EOF"
+    cat <<"EOF"
 
 
 ██╗    ██╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗
@@ -229,15 +229,15 @@ EOF
     echo
 
     if [ "$vpn_service" = "protonvpn" ]; then
-       log_warning "DO NOT USE YOUR PROTON ACCOUNT USERNAME AND PASSWORD. REFER TO THE DOCUMENTATION ABOVE TO OBTAIN THE CORRECT VPN USERNAME AND PASSWORD."
-       echo
+        log_warning "DO NOT USE YOUR PROTON ACCOUNT USERNAME AND PASSWORD. REFER TO THE DOCUMENTATION ABOVE TO OBTAIN THE CORRECT VPN USERNAME AND PASSWORD."
+        echo
     fi
 
     log_info "The next steps WILL FAIL if you don't follow the documentation correctly."
-    read -p "Press ENTER after you've READ the VPN documentation to continue..." -r
+    read -rp "Press ENTER after you've READ the VPN documentation to continue..." -r
 
     echo
-    read -p "VPN username (without spaces): " vpn_user
+    read -rp "VPN username (without spaces): " vpn_user
     [ -z "$vpn_user" ] && log_error "VPN username cannot be empty"
 
     # Port forwarding configuration
@@ -245,7 +245,7 @@ EOF
     log_info "Port forwarding allows for better connectivity in certain applications."
     log_info "However, not all VPN providers support this feature."
     log_info "Please check your VPN provider's documentation to see if they support port forwarding."
-    read -p "Enable port forwarding? (y/N) [Default = n]: " enable_port_forwarding
+    read -rp "Enable port forwarding? (y/N) [Default = n]: " enable_port_forwarding
     enable_port_forwarding=${enable_port_forwarding:-"n"}
 
     # Handle special cases for VPN providers
@@ -263,20 +263,20 @@ EOF
         unset vpn_password
         charcount=0
         prompt="VPN password: "
-        while IFS= read -p "$prompt" -r -s -n 1 char; do
+        while IFS= read -rp "$prompt" -r -s -n 1 char; do
             if [[ $char == $'\0' ]]; then
                 break
             fi
             if [[ $char == $'\177' ]]; then
                 if [ $charcount -gt 0 ]; then
-                    charcount=$((charcount-1))
+                    charcount=$((charcount - 1))
                     prompt=$'\b \b'
                     vpn_password="${vpn_password%?}"
                 else
                     prompt=''
                 fi
             else
-                charcount=$((charcount+1))
+                charcount=$((charcount + 1))
                 prompt='*'
                 vpn_password+="$char"
             fi
@@ -318,7 +318,7 @@ running_services_location() {
 }
 
 get_user_info() {
-    read -p "User to own the media server files? [$USER]: " username
+    read -rp "User to own the media server files? [$USER]: " username
     username=${username:-$USER}
 
     if id -u "$username" &>/dev/null; then
@@ -332,14 +332,14 @@ get_user_info() {
 }
 
 get_installation_paths() {
-    read -p "Installation directory? [$DEFAULT_INSTALL_DIR]: " install_directory
+    read -rp "Installation directory? [$DEFAULT_INSTALL_DIR]: " install_directory
     install_directory=${install_directory:-$DEFAULT_INSTALL_DIR}
     create_and_verify_directory "$install_directory" "installation"
 
-    read -p "Media directory? [$DEFAULT_MEDIA_DIR]: " media_directory
+    read -rp "Media directory? [$DEFAULT_MEDIA_DIR]: " media_directory
     media_directory=${media_directory:-$DEFAULT_MEDIA_DIR}
 
-    read -p "Are you sure your media directory is \"$media_directory\"? (y/N) [Default = n]: " media_directory_correct
+    read -rp "Are you sure your media directory is \"$media_directory\"? (y/N) [Default = n]: " media_directory_correct
     media_directory_correct=${media_directory_correct:-"n"}
 
     if [ "${media_directory_correct,,}" != "y" ]; then
@@ -380,36 +380,36 @@ update_configuration_files() {
     # Update .env file
     log_info "Updating environment configuration..."
     sed -i -e "s|<your_PUID>|$puid|g" \
-           -e "s|<your_PGID>|$pgid|g" \
-           -e "s|<media_directory>|$media_directory|g" \
-           -e "s|<media_service>|$media_service|g" \
-           -e "s|<install_directory>|$install_directory|g" \
-           -e "s|vpn_enabled|$setup_vpn|g" "$env_file" || \
+        -e "s|<your_PGID>|$pgid|g" \
+        -e "s|<media_directory>|$media_directory|g" \
+        -e "s|<media_service>|$media_service|g" \
+        -e "s|<install_directory>|$install_directory|g" \
+        -e "s|vpn_enabled|$setup_vpn|g" "$env_file" ||
         log_error "Failed to update .env file"
 
     # Update VPN configuration in .env file
-if [ "${setup_vpn,,}" == "y" ]; then
-sed -i -e "s|^VPN_ENABLED=.*|VPN_ENABLED=y|" \
-        -e "s|^VPN_SERVICE=.*|VPN_SERVICE=$vpn_service|" \
-        -e "s|^VPN_USER=.*|VPN_USER=$vpn_user|" \
-        -e "s|^VPN_PASSWORD=.*|VPN_PASSWORD=$vpn_password|" "$env_file" || \
-        log_error "Failed to update VPN configuration in .env"
-else
-sed -i -e "s|^VPN_ENABLED=.*|VPN_ENABLED=n|" "$env_file" || \
-        log_error "Failed to update VPN configuration in .env"
-fi
+    if [ "${setup_vpn,,}" == "y" ]; then
+        sed -i -e "s|^VPN_ENABLED=.*|VPN_ENABLED=y|" \
+            -e "s|^VPN_SERVICE=.*|VPN_SERVICE=$vpn_service|" \
+            -e "s|^VPN_USER=.*|VPN_USER=$vpn_user|" \
+            -e "s|^VPN_PASSWORD=.*|VPN_PASSWORD=$vpn_password|" "$env_file" ||
+            log_error "Failed to update VPN configuration in .env"
+    else
+        sed -i -e "s|^VPN_ENABLED=.*|VPN_ENABLED=n|" "$env_file" ||
+            log_error "Failed to update VPN configuration in .env"
+    fi
 
     # Update docker-compose.yaml
     log_info "Updating docker-compose configuration..."
-    sed -i "s|<media_service>|$media_service|g" "$filename" || \
+    sed -i "s|<media_service>|$media_service|g" "$filename" ||
         log_error "Failed to update docker-compose.yaml"
 
     # Configure Plex-specific settings
     if [ "$media_service" == "plex" ]; then
         log_info "Configuring Plex-specific settings..."
         sed -i -e 's|#network_mode: host # plex|network_mode: host # plex|g' \
-               -e 's|ports: # plex|#ports: # plex|g' \
-               -e 's|- 8096:8096 # plex|#- 8096:8096 # plex|g' "$filename" || \
+            -e 's|ports: # plex|#ports: # plex|g' \
+            -e 's|- 8096:8096 # plex|#- 8096:8096 # plex|g' "$filename" ||
             log_error "Failed to configure Plex settings"
     fi
 
@@ -421,25 +421,25 @@ fi
         [ "${enable_port_forwarding,,}" = "y" ] && port_forward_settings="on"
 
         sed -i -e "s|vpn_service|$vpn_service|g" \
-               -e "s|vpn_user|$vpn_user|g" \
-               -e "s|vpn_password|$vpn_password|g" \
-               -e "s|PORT_FORWARD_ONLY=on|PORT_FORWARD_ONLY=$port_forward_settings|g" \
-               -e "s|VPN_PORT_FORWARDING=on|VPN_PORT_FORWARDING=$port_forward_settings|g" \
-               -e 's|#network_mode: "service:gluetun"|network_mode: "service:gluetun"|g' \
-               -e 's|ports: # qbittorrent|#ports: # qbittorrent|g' \
-               -e 's|ports: # sabnzbd|#ports: # sabnzbd|g' \
-               -e 's|- 8081:8081 # qbittorrent|#- 8081:8081 # qbittorrent|g' \
-               -e 's|- 8080:8080 # sabnzbd|#- 8080:8080 # sabnzbd|g' \
-               -e 's|#- 8080:8080/tcp # gluetun|- 8080:8080/tcp # gluetun|g' \
-               -e 's|#- 8081:8081/tcp # gluetun|- 8081:8081/tcp # gluetun|g' "$filename" || \
+            -e "s|vpn_user|$vpn_user|g" \
+            -e "s|vpn_password|$vpn_password|g" \
+            -e "s|PORT_FORWARD_ONLY=on|PORT_FORWARD_ONLY=$port_forward_settings|g" \
+            -e "s|VPN_PORT_FORWARDING=on|VPN_PORT_FORWARDING=$port_forward_settings|g" \
+            -e 's|#network_mode: "service:gluetun"|network_mode: "service:gluetun"|g' \
+            -e 's|ports: # qbittorrent|#ports: # qbittorrent|g' \
+            -e 's|ports: # sabnzbd|#ports: # sabnzbd|g' \
+            -e 's|- 8081:8081 # qbittorrent|#- 8081:8081 # qbittorrent|g' \
+            -e 's|- 8080:8080 # sabnzbd|#- 8080:8080 # sabnzbd|g' \
+            -e 's|#- 8080:8080/tcp # gluetun|- 8080:8080/tcp # gluetun|g' \
+            -e 's|#- 8081:8081/tcp # gluetun|- 8081:8081/tcp # gluetun|g' "$filename" ||
             log_error "Failed to configure VPN settings"
     fi
 
     # Update YAMS CLI script
     log_info "Updating YAMS CLI configuration..."
     sed -i -e "s|<filename>|$filename|g" \
-           -e "s|<custom_file_filename>|$install_directory/docker-compose.custom.yaml|g" \
-           -e "s|<install_directory>|$install_directory|g" "$yams_script" || \
+        -e "s|<custom_file_filename>|$install_directory/docker-compose.custom.yaml|g" \
+        -e "s|<install_directory>|$install_directory|g" "$yams_script" ||
         log_error "Failed to update YAMS CLI script"
 }
 
@@ -513,7 +513,7 @@ set_permissions
 
 printf "\033c"
 
-cat << "EOF"
+cat <<"EOF"
 ========================================================
      _____          ___           ___           ___
     /  /::\        /  /\         /__/\         /  /\
@@ -541,7 +541,7 @@ echo
 log_info "You might need to wait for a couple of minutes while everything gets up and running"
 echo
 log_info "All the service locations are also saved in ~/yams_services.txt"
-running_services_location > ~/yams_services.txt
+running_services_location >~/yams_services.txt
 
 log_info "========================================================"
 echo
