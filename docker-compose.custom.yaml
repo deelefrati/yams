@@ -4,7 +4,7 @@ services:
     container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
-      - TZ=America/Sao_Paulo
+      - TZ=${TZ}
       - PORT=5055 #optional
     ports:
       - 5055:5055
@@ -16,7 +16,7 @@ services:
     container_name: flaresolverr
     environment:
       - LOG_LEVEL=info
-      - TZ=America/Sao_Paulo
+      - TZ=${TZ}
     ports:
       - 8191:8191
     restart: unless-stopped
@@ -24,9 +24,9 @@ services:
     container_name: nginx
     image: 'jc21/nginx-proxy-manager:latest'
     ports:
-      - '80:80'
-      - '443:443'
-      - '81:81'
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '81:81' # Admin Web Port
     environment:
       DISABLE_IPV6: 'true'
     healthcheck:
@@ -36,4 +36,17 @@ services:
     volumes:
       - ${INSTALL_DIRECTORY}/config/nginx/data:/data
       - ${INSTALL_DIRECTORY}/config/nginx/letsencrypt:/etc/letsencrypt
-    restart: unless-stoppe
+    restart: unless-stopped
+  unpackerr:
+    image: golift/unpackerr
+    container_name: unpackerr
+    volumes:
+      - ${MEDIA_DIRECTORY}:/downloads
+      - ${INSTALL_DIRECTORY}/config/unpackerr:/config
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - UN_SONARR_0_URL=http://sonarr:8989
+      - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
+      - UN_RADARR_0_URL=http://radarr:7878
+      - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
