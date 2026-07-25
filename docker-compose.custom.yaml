@@ -78,14 +78,31 @@ services:
       - PGID=1000
       - UMASK=022
       - TZ=America/Sao_Paulo
-  byparr:
-    image: ghcr.io/thephaseless/byparr:2.1.0
-    container_name: byparr
-    environment:
-      - LOG_LEVEL=INFO
-    ports:
-      - 8191:8191
+  trawl:
+    image: ghcr.io/germondai/trawl:latest
+    container_name: trawl
     restart: unless-stopped
+    ports:
+      - "8191:8191"
+    shm_size: 1gb
+    mem_limit: 3g
+    environment:
+      REDIS_URL: redis://redis:6379
+      BROWSER_POOL_SIZE: 5
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8191/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+  # used by trawl
+  redis:
+    image: redis:8.8-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
   decluttarr:
     image: ghcr.io/manimatter/decluttarr:latest
     container_name: decluttarr
@@ -99,3 +116,6 @@ services:
       QBITTORRENT_PASSWORD: ${QBITTORRENT_PASSWORD}
     volumes:
       - ${INSTALL_DIRECTORY}/config/decluttarr/config.yaml:/app/config/config.yaml
+
+volumes:
+  redis_data:
