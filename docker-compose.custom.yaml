@@ -1,24 +1,26 @@
 services:
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    user: 1000:1000
+    container_name: seerr
     environment:
       - LOG_LEVEL=debug
       - TZ=${TZ}
+      - TZ=America/Sao_Paulo
+      - PUID=${PUID}
+      - PGID=${PGID}
       - PORT=5055 #optional
     ports:
       - 5055:5055
     volumes:
       - ${INSTALL_DIRECTORY}/config/${MEDIA_SERVICE}:/app/config
-    restart: unless-stopped
-  flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    container_name: flaresolverr
-    environment:
-      - LOG_LEVEL=info
-      - TZ=${TZ}
-    ports:
-      - 8191:8191
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
     restart: unless-stopped
   nginx:
     container_name: nginx
@@ -50,3 +52,50 @@ services:
       - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
       - UN_RADARR_0_URL=http://radarr:7878
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
+  profilarr:
+    image: santiagosayshey/profilarr
+    container_name: profilarr
+    ports:
+        - 6868:6868
+    volumes:
+        - ${MEDIA_DIRECTORY}:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    restart: unless-stopped
+  cleanuparr:
+    image: ghcr.io/cleanuparr/cleanuparr:latest
+    container_name: cleanuparr
+    restart: unless-stopped
+    ports:
+      - 11011:11011
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/cleanuparr:/config
+    environment:
+      - PORT=11011
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+      - TZ=America/Sao_Paulo
+  byparr:
+    image: ghcr.io/thephaseless/byparr:2.1.0
+    container_name: byparr
+    environment:
+      - LOG_LEVEL=INFO
+    ports:
+      - 8191:8191
+    restart: unless-stopped
+  decluttarr:
+    image: ghcr.io/manimatter/decluttarr:latest
+    container_name: decluttarr
+    restart: unless-stopped
+    environment:
+      TZ: America/Sao_Paulo
+      PUID: 1000
+      PGID: 1000
+      SONARR_API_KEY: ${SONARR_API_KEY}
+      RADARR_API_KEY: ${RADARR_API_KEY}
+      QBITTORRENT_PASSWORD: ${QBITTORRENT_PASSWORD}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/decluttarr/config.yaml:/app/config/config.yaml
