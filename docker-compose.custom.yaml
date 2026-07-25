@@ -5,7 +5,7 @@ services:
     user: 1000:1000
     container_name: seerr
     environment:
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=INFO
       - TZ=${TZ}
       - TZ=America/Sao_Paulo
       - PUID=${PUID}
