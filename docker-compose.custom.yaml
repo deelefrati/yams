@@ -1,4 +1,13 @@
 services:
+  # override: delay updates until images are >=2 weeks old (base watchtower def is yams-managed)
+  watchtower:
+    environment:
+      - WATCHTOWER_COOLDOWN_DELAY=2w
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_URL=gotify://gotify:80/${WATCHTOWER_GOTIFY_TOKEN}?disabletls=yes
+    networks:
+      - default
+      - gotify
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     init: true
