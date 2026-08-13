@@ -12,7 +12,7 @@ services:
       - PGID=${PGID}
       - PORT=5055 #optional
     ports:
-      - 5055:5055
+      - 127.0.0.1:5055:5055
     volumes:
       - ${INSTALL_DIRECTORY}/config/${MEDIA_SERVICE}:/app/config
     healthcheck:
@@ -28,7 +28,7 @@ services:
     ports:
       - '80:80' # Public HTTP Port
       - '443:443' # Public HTTPS Port
-      - '81:81' # Admin Web Port
+      - '127.0.0.1:81:81' # Admin Web Port (loopback-only; use nginx.lab-delefrati.duckdns.org)
     environment:
       DISABLE_IPV6: 'true'
     healthcheck:
@@ -38,6 +38,11 @@ services:
     volumes:
       - ${INSTALL_DIRECTORY}/config/nginx/data:/data
       - ${INSTALL_DIRECTORY}/config/nginx/letsencrypt:/etc/letsencrypt
+    networks:
+      - default
+      - immich
+      - gotify
+      - securo
     restart: unless-stopped
   unpackerr:
     image: golift/unpackerr
@@ -56,7 +61,7 @@ services:
     image: santiagosayshey/profilarr
     container_name: profilarr
     ports:
-        - 6868:6868
+        - 127.0.0.1:6868:6868
     volumes:
         - ${MEDIA_DIRECTORY}:/config
     environment:
@@ -69,7 +74,7 @@ services:
     container_name: cleanuparr
     restart: unless-stopped
     ports:
-      - 11011:11011
+      - 127.0.0.1:11011:11011
     volumes:
       - ${INSTALL_DIRECTORY}/config/cleanuparr:/config
     environment:
@@ -83,7 +88,7 @@ services:
     container_name: trawl
     restart: unless-stopped
     ports:
-      - "8191:8191"
+      - "127.0.0.1:8191:8191"
     shm_size: 1gb
     mem_limit: 3g
     environment:
@@ -116,6 +121,15 @@ services:
       QBITTORRENT_PASSWORD: ${QBITTORRENT_PASSWORD}
     volumes:
       - ${INSTALL_DIRECTORY}/config/decluttarr/config.yaml:/app/config/config.yaml
-
 volumes:
   redis_data:
+networks:
+  immich:
+    external: true
+    name: immich_default
+  gotify:
+    external: true
+    name: gotify_default
+  securo:
+    external: true
+    name: securo_default
