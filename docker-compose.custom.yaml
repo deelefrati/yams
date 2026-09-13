@@ -3,8 +3,14 @@ services:
   watchtower:
     environment:
       - WATCHTOWER_COOLDOWN_DELAY=2w
+      # run at 05:00 UTC, one hour after yams-backup.sh (cron 04:00) - a 24h timer drifts on restart
+      - WATCHTOWER_SCHEDULE=0 0 5 * * *
       - WATCHTOWER_NOTIFICATIONS=shoutrrr
       - WATCHTOWER_NOTIFICATION_URL=gotify://gotify:80/${WATCHTOWER_GOTIFY_TOKEN}?disabletls=yes
+      # without report mode watchtower sends nothing at all - verified: zero gotify messages since 2026-08-13
+      - WATCHTOWER_NOTIFICATION_REPORT=true
+      # only speak up when something is stale, was updated, or failed; silent otherwise
+      - 'WATCHTOWER_NOTIFICATION_TEMPLATE={{- if .Report -}}{{- with .Report -}}{{- range .Scanned -}}{{- if eq (print .State) "Stale" -}}Update available: {{.Name}} ({{.ImageName}}) {{.CurrentImageID.ShortID}} -> {{.LatestImageID.ShortID}}{{"\n"}}{{- end -}}{{- end -}}{{- range .Updated -}}Updated: {{.Name}} ({{.ImageName}}) {{.CurrentImageID.ShortID}} -> {{.LatestImageID.ShortID}}{{"\n"}}{{- end -}}{{- range .Failed -}}FAILED: {{.Name}} ({{.ImageName}}): {{.Error}}{{"\n"}}{{- end -}}{{- end -}}{{- end -}}'
     networks:
       - default
       - gotify
@@ -23,7 +29,7 @@ services:
     ports:
       - 127.0.0.1:5055:5055
     volumes:
-      - ${INSTALL_DIRECTORY}/config/${MEDIA_SERVICE}:/app/config
+      - ${INSTALL_DIRECTORY}/config/seerr:/app/config
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
