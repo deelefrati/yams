@@ -10,22 +10,25 @@ services:
   # file are committed and pushed by ~/bin/wud-autocommit.sh (cron). Needs the real docker socket:
   # the compose trigger refuses to update containers seen through a TCP/proxy watcher.
   wud:
-    image: getwud/wud:8.1.1
+    image: getwud/wud:9.4.1
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
       - 'wud.trigger.exclude=dockercompose.yams' # never self-update; bump wud by hand
     container_name: wud
     restart: unless-stopped
     ports:
-      - 127.0.0.1:3001:3000 # 3000 is taken by securo-frontend; no auth, keep it on loopback
+      - 127.0.0.1:3001:3000 # 3000 is taken by securo-frontend; login required since wud 9
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${INSTALL_DIRECTORY}/config/wud:/store # sqlite: users, api tokens, container state
       - /home/delefrati/projects/yams:/compose/yams # directories, not files: editors/git replace inodes
       - /home/delefrati/projects/securo:/compose/securo
       - /home/delefrati/projects/gotify:/compose/gotify
       - /home/delefrati/projects/smtp-gotify:/compose/smtp-gotify
     environment:
       - TZ=America/Sao_Paulo
+      - WUD_AUTH_ADMIN_USER=${WUD_ADMIN_USER} # wud 9 refuses to start without an admin
+      - WUD_AUTH_ADMIN_PASSWORD=${WUD_ADMIN_PASSWORD}
       - WUD_WATCHER_LOCAL_CRON=0 8 * * *
       - WUD_TRIGGER_GOTIFY_LOCAL_URL=http://gotify:80
       - WUD_TRIGGER_GOTIFY_LOCAL_TOKEN=${WUD_GOTIFY_TOKEN}
