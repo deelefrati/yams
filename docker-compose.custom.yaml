@@ -73,12 +73,12 @@ services:
       - UN_RADARR_0_URL=http://radarr:7878
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
   profilarr:
-    image: santiagosayshey/profilarr
+    image: santiagosayshey/profilarr:v1.1.5
     container_name: profilarr
     ports:
         - 127.0.0.1:6868:6868
     volumes:
-        - ${MEDIA_DIRECTORY}:/config
+        - ${INSTALL_DIRECTORY}/config/profilarr:/config
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
