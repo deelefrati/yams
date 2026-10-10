@@ -1,47 +1,60 @@
 services:
-  # watchtower is defined in the yams-managed base file; disabled here, replaced by wud (notify-only)
+  # watchtower is defined in the yams-managed base file; disabled here, replaced by wud.
+  # image is repeated so every service has one - wud's compose trigger crashes on services without it.
   watchtower:
+    image: nickfedor/watchtower
     profiles: ["disabled"]
 
-  # wud: watches all containers on the host and notifies via gotify; never updates anything.
-  # It has no docker.sock - it reads the docker API through a GET-only proxy on an internal network.
-  wud-socket-proxy:
-    image: tecnativa/docker-socket-proxy:v0.4.2
-    labels:
-      - 'wud.tag.include=^v\d+\.\d+\.\d+$$'
-    container_name: wud-socket-proxy
-    restart: unless-stopped
-    environment:
-      - CONTAINERS=1
-      - IMAGES=1
-      - EVENTS=1
-      - POST=0
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - wud-docker
+  # wud: checks daily at 08:00. Minor/patch updates are applied automatically by rewriting the tag
+  # in the compose file + recreating the container; majors only notify (gotify). Changes to this
+  # file are committed and pushed by ~/bin/wud-autocommit.sh (cron). Needs the real docker socket:
+  # the compose trigger refuses to update containers seen through a TCP/proxy watcher.
   wud:
     image: getwud/wud:8.1.1
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
+      - 'wud.trigger.exclude=dockercompose.yams' # never self-update; bump wud by hand
     container_name: wud
     restart: unless-stopped
-    depends_on:
-      - wud-socket-proxy
     ports:
-      - 127.0.0.1:3001:3000 # 3000 is taken by securo-frontend
+      - 127.0.0.1:3001:3000 # 3000 is taken by securo-frontend; no auth, keep it on loopback
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/delefrati/projects/yams:/compose/yams # directories, not files: editors/git replace inodes
+      - /home/delefrati/projects/securo:/compose/securo
+      - /home/delefrati/projects/gotify:/compose/gotify
+      - /home/delefrati/projects/smtp-gotify:/compose/smtp-gotify
     environment:
       - TZ=America/Sao_Paulo
-      - WUD_WATCHER_LOCAL_HOST=wud-socket-proxy
-      - WUD_WATCHER_LOCAL_PORT=2375
       - WUD_WATCHER_LOCAL_CRON=0 8 * * *
       - WUD_TRIGGER_GOTIFY_LOCAL_URL=http://gotify:80
       - WUD_TRIGGER_GOTIFY_LOCAL_TOKEN=${WUD_GOTIFY_TOKEN}
       - WUD_TRIGGER_GOTIFY_LOCAL_PRIORITY=5
+      # one compose trigger per file. threshold=minor: skip majors. once=false: keep retrying an
+      # update that is still pending (the default only fires the first time a version is seen).
+      - WUD_TRIGGER_DOCKERCOMPOSE_YAMS_FILE=/compose/yams/docker-compose.custom.yaml
+      - WUD_TRIGGER_DOCKERCOMPOSE_YAMS_THRESHOLD=minor
+      - WUD_TRIGGER_DOCKERCOMPOSE_YAMS_ONCE=false
+      - WUD_TRIGGER_DOCKERCOMPOSE_YAMS_PRUNE=true
+      - WUD_TRIGGER_DOCKERCOMPOSE_YAMS_DRYRUN=${WUD_DRYRUN:-false}
+      - WUD_TRIGGER_DOCKERCOMPOSE_SECURO_FILE=/compose/securo/docker-compose.yml
+      - WUD_TRIGGER_DOCKERCOMPOSE_SECURO_THRESHOLD=minor
+      - WUD_TRIGGER_DOCKERCOMPOSE_SECURO_ONCE=false
+      - WUD_TRIGGER_DOCKERCOMPOSE_SECURO_PRUNE=true
+      - WUD_TRIGGER_DOCKERCOMPOSE_SECURO_DRYRUN=${WUD_DRYRUN:-false}
+      - WUD_TRIGGER_DOCKERCOMPOSE_GOTIFY_FILE=/compose/gotify/docker-compose.yaml
+      - WUD_TRIGGER_DOCKERCOMPOSE_GOTIFY_THRESHOLD=minor
+      - WUD_TRIGGER_DOCKERCOMPOSE_GOTIFY_ONCE=false
+      - WUD_TRIGGER_DOCKERCOMPOSE_GOTIFY_PRUNE=true
+      - WUD_TRIGGER_DOCKERCOMPOSE_GOTIFY_DRYRUN=${WUD_DRYRUN:-false}
+      - WUD_TRIGGER_DOCKERCOMPOSE_SMTPGOTIFY_FILE=/compose/smtp-gotify/docker-compose.yml
+      - WUD_TRIGGER_DOCKERCOMPOSE_SMTPGOTIFY_THRESHOLD=minor
+      - WUD_TRIGGER_DOCKERCOMPOSE_SMTPGOTIFY_ONCE=false
+      - WUD_TRIGGER_DOCKERCOMPOSE_SMTPGOTIFY_PRUNE=true
+      - WUD_TRIGGER_DOCKERCOMPOSE_SMTPGOTIFY_DRYRUN=${WUD_DRYRUN:-false}
     networks:
       - default
       - gotify
-      - wud-docker
 
   # pinned versions for services defined in the yams-managed base file; bump after reviewing wud notifications.
   # ghcr.io/linuxserver = same images as lscr.io, but wud can read ghcr anonymously (its lscr provider needs a github token)
@@ -199,6 +212,7 @@ services:
     labels:
       - 'wud.tag.include=^8\.8-alpine$$'
       - 'wud.watch.digest=true'
+      - 'wud.trigger.exclude=dockercompose.yams' # rebuilds of a floating tag: notify only
     restart: unless-stopped
     volumes:
       - redis_data:/data
@@ -267,5 +281,3 @@ networks:
   securo:
     external: true
     name: securo_default
-  wud-docker:
-    internal: true
