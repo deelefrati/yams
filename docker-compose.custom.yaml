@@ -3,14 +3,14 @@ services:
   # image is repeated so every service has one - wud's compose trigger crashes on services without it.
   watchtower:
     image: nickfedor/watchtower
-    profiles: ["disabled"]
+    profiles: [ "disabled" ]
 
   # wud: checks daily at 08:00. Minor/patch updates are applied automatically by rewriting the tag
   # in the compose file + recreating the container; majors only notify (gotify). Changes to this
   # file are committed and pushed by ~/bin/wud-autocommit.sh (cron). Needs the real docker socket:
   # the compose trigger refuses to update containers seen through a TCP/proxy watcher.
   wud:
-    image: getwud/wud:9.4.1
+    image: getwud/wud:9.5.0
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
       - 'wud.trigger.exclude=dockercompose.yams' # never self-update; bump wud by hand
@@ -62,40 +62,40 @@ services:
   # pinned versions for services defined in the yams-managed base file; bump after reviewing wud notifications.
   # ghcr.io/linuxserver = same images as lscr.io, but wud can read ghcr anonymously (its lscr provider needs a github token)
   jellyfin:
-    image: ghcr.io/linuxserver/jellyfin:12.2ubu2604-ls53
+    image: ghcr.io/linuxserver/jellyfin:12.3ubu2604-ls56
     labels:
       - 'wud.tag.include=^\d+\.\d+(\.\d+)?ubu\d+-ls\d+$$'
   qbittorrent:
-    image: ghcr.io/linuxserver/qbittorrent:5.2.4_v2.0.15-ls479
+    image: ghcr.io/linuxserver/qbittorrent:5.3.0_v2.1.2-ls484
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+_v[\d.]+-ls\d+$$'
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)_v[\d.]+-ls(\d+)$$ => $$1-$$2'
   sonarr:
-    image: ghcr.io/linuxserver/sonarr:4.0.20.3014-ls327
+    image: ghcr.io/linuxserver/sonarr:4.0.20.3014-ls329
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)\.(\d+)-ls(\d+)$$ => $$1-$$2.$$3'
   radarr:
-    image: ghcr.io/linuxserver/radarr:6.4.4.10685-ls319
+    image: ghcr.io/linuxserver/radarr:6.4.4.10685-ls323
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)\.(\d+)-ls(\d+)$$ => $$1-$$2.$$3'
   bazarr:
-    image: ghcr.io/linuxserver/bazarr:v1.6.2-ls367
+    image: ghcr.io/linuxserver/bazarr:v1.6.2-ls369
     labels:
       - 'wud.tag.include=^v\d+\.\d+\.\d+-ls\d+$$'
       - 'wud.tag.transform=^v(\d+\.\d+\.\d+)-ls(\d+)$$ => $$1-$$2'
   prowlarr:
-    image: ghcr.io/linuxserver/prowlarr:2.6.5.5623-ls163
+    image: ghcr.io/linuxserver/prowlarr:2.6.5.5623-ls165
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)\.(\d+)-ls(\d+)$$ => $$1-$$2.$$3'
 
   seerr:
-    image: ghcr.io/seerr-team/seerr:v3.5.0
+    image: ghcr.io/seerr-team/seerr:v3.5.1
     labels:
       - 'wud.tag.include=^v\d+\.\d+\.\d+$$'
     init: true
@@ -131,7 +131,7 @@ services:
     environment:
       DISABLE_IPV6: 'true'
     healthcheck:
-      test: ["CMD", "/usr/bin/check-health"]
+      test: [ "CMD", "/usr/bin/check-health" ]
       interval: 10s
       timeout: 3s
     volumes:
@@ -164,16 +164,16 @@ services:
       - 'wud.tag.include=^v\d+\.\d+\.\d+$$'
     container_name: profilarr
     ports:
-        - 127.0.0.1:6868:6868
+      - 127.0.0.1:6868:6868
     volumes:
-        - ${INSTALL_DIRECTORY}/config/profilarr:/config
+      - ${INSTALL_DIRECTORY}/config/profilarr:/config
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     restart: unless-stopped
   cleanuparr:
-    image: ghcr.io/cleanuparr/cleanuparr:2.10.9
+    image: ghcr.io/cleanuparr/cleanuparr:2.10.12
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
     container_name: cleanuparr
@@ -189,7 +189,7 @@ services:
       - UMASK=022
       - TZ=America/Sao_Paulo
   trawl:
-    image: ghcr.io/germondai/trawl:1.8.0
+    image: ghcr.io/germondai/trawl:1.9.2
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
     container_name: trawl
@@ -204,7 +204,7 @@ services:
     depends_on:
       - redis
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:8191/health"]
+      test: [ "CMD", "curl", "-sf", "http://localhost:8191/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -255,7 +255,7 @@ services:
       interval: 30s
       retries: 3
   lidarr:
-    image: ghcr.io/linuxserver/lidarr:3.1.0.4875-ls43
+    image: ghcr.io/linuxserver/lidarr:3.1.0.4875-ls45
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
