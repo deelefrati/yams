@@ -189,7 +189,7 @@ services:
       - UMASK=022
       - TZ=America/Sao_Paulo
   trawl:
-    image: ghcr.io/germondai/trawl:1.9.2
+    image: ghcr.io/germondai/trawl:1.9.3
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
     container_name: trawl
