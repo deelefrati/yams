@@ -66,7 +66,7 @@ services:
     labels:
       - 'wud.tag.include=^\d+\.\d+(\.\d+)?ubu\d+-ls\d+$$'
   qbittorrent:
-    image: ghcr.io/linuxserver/qbittorrent:5.3.0_v2.1.2-ls484
+    image: ghcr.io/linuxserver/qbittorrent:5.3.0_v2.1.2-ls485
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+_v[\d.]+-ls\d+$$'
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)_v[\d.]+-ls(\d+)$$ => $$1-$$2'
@@ -255,7 +255,7 @@ services:
       interval: 30s
       retries: 3
   lidarr:
-    image: ghcr.io/linuxserver/lidarr:3.1.0.4875-ls45
+    image: ghcr.io/linuxserver/lidarr:3.1.6.5079-ls46
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
