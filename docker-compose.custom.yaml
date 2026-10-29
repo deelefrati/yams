@@ -62,7 +62,7 @@ services:
   # pinned versions for services defined in the yams-managed base file; bump after reviewing wud notifications.
   # ghcr.io/linuxserver = same images as lscr.io, but wud can read ghcr anonymously (its lscr provider needs a github token)
   jellyfin:
-    image: ghcr.io/linuxserver/jellyfin:12.3ubu2604-ls56
+    image: ghcr.io/linuxserver/jellyfin:12.4ubu2604-ls57
     labels:
       - 'wud.tag.include=^\d+\.\d+(\.\d+)?ubu\d+-ls\d+$$'
   qbittorrent:
