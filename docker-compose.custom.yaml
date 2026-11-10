@@ -62,11 +62,11 @@ services:
   # pinned versions for services defined in the yams-managed base file; bump after reviewing wud notifications.
   # ghcr.io/linuxserver = same images as lscr.io, but wud can read ghcr anonymously (its lscr provider needs a github token)
   jellyfin:
-    image: ghcr.io/linuxserver/jellyfin:12.4ubu2604-ls57
+    image: ghcr.io/linuxserver/jellyfin:12.4ubu2604-ls58
     labels:
       - 'wud.tag.include=^\d+\.\d+(\.\d+)?ubu\d+-ls\d+$$'
   qbittorrent:
-    image: ghcr.io/linuxserver/qbittorrent:5.3.0_v2.1.2-ls485
+    image: ghcr.io/linuxserver/qbittorrent:5.3.0_v2.1.2-ls487
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+_v[\d.]+-ls\d+$$'
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)_v[\d.]+-ls(\d+)$$ => $$1-$$2'
@@ -77,18 +77,18 @@ services:
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)\.(\d+)-ls(\d+)$$ => $$1-$$2.$$3'
   radarr:
-    image: ghcr.io/linuxserver/radarr:6.4.4.10685-ls323
+    image: ghcr.io/linuxserver/radarr:6.4.4.10685-ls326
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)\.(\d+)-ls(\d+)$$ => $$1-$$2.$$3'
   bazarr:
-    image: ghcr.io/linuxserver/bazarr:v1.6.2-ls369
+    image: ghcr.io/linuxserver/bazarr:v1.6.2-ls371
     labels:
       - 'wud.tag.include=^v\d+\.\d+\.\d+-ls\d+$$'
       - 'wud.tag.transform=^v(\d+\.\d+\.\d+)-ls(\d+)$$ => $$1-$$2'
   prowlarr:
-    image: ghcr.io/linuxserver/prowlarr:2.6.5.5623-ls165
+    image: ghcr.io/linuxserver/prowlarr:2.7.0.5723-ls167
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
@@ -255,7 +255,7 @@ services:
       interval: 30s
       retries: 3
   lidarr:
-    image: ghcr.io/linuxserver/lidarr:3.1.6.5079-ls46
+    image: ghcr.io/linuxserver/lidarr:3.1.6.5079-ls47
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
