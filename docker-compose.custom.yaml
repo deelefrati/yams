@@ -173,7 +173,7 @@ services:
       - TZ=${TZ}
     restart: unless-stopped
   cleanuparr:
-    image: ghcr.io/cleanuparr/cleanuparr:2.10.12
+    image: ghcr.io/cleanuparr/cleanuparr:2.11.0
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
     container_name: cleanuparr
@@ -189,7 +189,7 @@ services:
       - UMASK=022
       - TZ=America/Sao_Paulo
   trawl:
-    image: ghcr.io/germondai/trawl:1.9.3
+    image: ghcr.io/germondai/trawl:1.11.0
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
     container_name: trawl
