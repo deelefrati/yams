@@ -144,7 +144,7 @@ services:
       - securo
     restart: unless-stopped
   unpackerr:
-    image: golift/unpackerr:0.16.1
+    image: golift/unpackerr:1.0.1
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
     container_name: unpackerr
