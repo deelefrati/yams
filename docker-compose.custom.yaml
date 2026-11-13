@@ -83,7 +83,7 @@ services:
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)\.(\d+)-ls(\d+)$$ => $$1-$$2.$$3'
   bazarr:
-    image: ghcr.io/linuxserver/bazarr:v1.6.2-ls371
+    image: ghcr.io/linuxserver/bazarr:v1.6.2-ls372
     labels:
       - 'wud.tag.include=^v\d+\.\d+\.\d+-ls\d+$$'
       - 'wud.tag.transform=^v(\d+\.\d+\.\d+)-ls(\d+)$$ => $$1-$$2'
