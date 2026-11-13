@@ -10,7 +10,7 @@ services:
   # file are committed and pushed by ~/bin/wud-autocommit.sh (cron). Needs the real docker socket:
   # the compose trigger refuses to update containers seen through a TCP/proxy watcher.
   wud:
-    image: getwud/wud:9.5.0
+    image: getwud/wud:9.8.0
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
       - 'wud.trigger.exclude=dockercompose.yams' # never self-update; bump wud by hand
@@ -62,7 +62,7 @@ services:
   # pinned versions for services defined in the yams-managed base file; bump after reviewing wud notifications.
   # ghcr.io/linuxserver = same images as lscr.io, but wud can read ghcr anonymously (its lscr provider needs a github token)
   jellyfin:
-    image: ghcr.io/linuxserver/jellyfin:12.4ubu2604-ls58
+    image: ghcr.io/linuxserver/jellyfin:12.4ubu2604-ls59
     labels:
       - 'wud.tag.include=^\d+\.\d+(\.\d+)?ubu\d+-ls\d+$$'
   qbittorrent:
@@ -71,7 +71,7 @@ services:
       - 'wud.tag.include=^\d+\.\d+\.\d+_v[\d.]+-ls\d+$$'
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)_v[\d.]+-ls(\d+)$$ => $$1-$$2'
   sonarr:
-    image: ghcr.io/linuxserver/sonarr:4.0.20.3014-ls329
+    image: ghcr.io/linuxserver/sonarr:4.0.20.3014-ls4
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
@@ -88,7 +88,7 @@ services:
       - 'wud.tag.include=^v\d+\.\d+\.\d+-ls\d+$$'
       - 'wud.tag.transform=^v(\d+\.\d+\.\d+)-ls(\d+)$$ => $$1-$$2'
   prowlarr:
-    image: ghcr.io/linuxserver/prowlarr:2.7.0.5723-ls167
+    image: ghcr.io/linuxserver/prowlarr:2.7.0.5723-ls168
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
@@ -255,7 +255,7 @@ services:
       interval: 30s
       retries: 3
   lidarr:
-    image: ghcr.io/linuxserver/lidarr:3.1.6.5079-ls47
+    image: ghcr.io/linuxserver/lidarr:3.1.6.5079-ls48
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
