@@ -76,6 +76,9 @@ services:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
       - 'wud.tag.transform=^(\d+\.\d+\.\d+)\.(\d+)-ls(\d+)$$ => $$1-$$2.$$3'
+      # linuxserver reset the ls counter on 4.0.20.3014 (ls329 -> ls1). Hide the old-counter builds,
+      # or wud ranks ls329 above ls4 and "updates" sonarr back to it. Dead once sonarr ships 4.0.21.
+      - 'wud.tag.exclude=^4\.0\.20\.3014-ls\d\d\d$$'
   radarr:
     image: ghcr.io/linuxserver/radarr:6.4.4.10685-ls326
     labels:
