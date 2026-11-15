@@ -178,7 +178,7 @@ services:
       - TZ=${TZ}
     restart: unless-stopped
   cleanuparr:
-    image: ghcr.io/cleanuparr/cleanuparr:2.11.0
+    image: ghcr.io/cleanuparr/cleanuparr:2.11.1
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
     container_name: cleanuparr
