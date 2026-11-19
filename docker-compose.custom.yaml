@@ -126,7 +126,7 @@ services:
     restart: unless-stopped
   nginx:
     container_name: nginx
-    image: 'jc21/nginx-proxy-manager:2.17.0'
+    image: 'jc21/nginx-proxy-manager:2.17.1'
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
     ports:
