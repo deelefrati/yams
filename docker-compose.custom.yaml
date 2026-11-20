@@ -82,7 +82,7 @@ services:
       # or wud ranks ls329 above ls4 and "updates" sonarr back to it. Dead once sonarr ships 4.0.21.
       - 'wud.tag.exclude=^4\.0\.20\.3014-ls\d\d\d$$'
   radarr:
-    image: ghcr.io/linuxserver/radarr:6.4.4.10685-ls326
+    image: ghcr.io/linuxserver/radarr:7.0.3.10918-ls328
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
@@ -93,7 +93,7 @@ services:
       - 'wud.tag.include=^v\d+\.\d+\.\d+-ls\d+$$'
       - 'wud.tag.transform=^v(\d+\.\d+\.\d+)-ls(\d+)$$ => $$1-$$2'
   prowlarr:
-    image: ghcr.io/linuxserver/prowlarr:2.7.0.5723-ls168
+    image: ghcr.io/linuxserver/prowlarr:3.0.2.5780-ls169
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
