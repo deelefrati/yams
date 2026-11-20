@@ -64,7 +64,7 @@ services:
   # pinned versions for services defined in the yams-managed base file; bump after reviewing wud notifications.
   # ghcr.io/linuxserver = same images as lscr.io, but wud can read ghcr anonymously (its lscr provider needs a github token)
   jellyfin:
-    image: ghcr.io/linuxserver/jellyfin:12.4ubu2604-ls59
+    image: ghcr.io/linuxserver/jellyfin:12.4ubu2604-ls60
     labels:
       - 'wud.tag.include=^\d+\.\d+(\.\d+)?ubu\d+-ls\d+$$'
   qbittorrent:
@@ -260,7 +260,7 @@ services:
       interval: 30s
       retries: 3
   lidarr:
-    image: ghcr.io/linuxserver/lidarr:3.1.6.5079-ls48
+    image: ghcr.io/linuxserver/lidarr:3.1.6.5079-ls49
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+\.\d+-ls\d+$$'
       # wud's loose semver parse mangles 4.0.19.2979 into 4.0.1-9...; rewrite to 4.0.19-2979.<ls> first
