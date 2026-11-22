@@ -10,7 +10,7 @@ services:
   # file are committed and pushed by ~/bin/wud-autocommit.sh (cron). Needs the real docker socket:
   # the compose trigger refuses to update containers seen through a TCP/proxy watcher.
   wud:
-    image: getwud/wud:9.8.0
+    image: getwud/wud:9.9.0
     labels:
       - 'wud.tag.include=^\d+\.\d+\.\d+$$'
       - 'wud.trigger.exclude=dockercompose.yams' # never self-update; bump wud by hand
